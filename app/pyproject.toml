@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "task-tool"
+version = "0.0.1"
+description = "TT"
+authors = ["Andrei Pokhila <andrei.pokhila@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+fastapi = "^0.61.1"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
