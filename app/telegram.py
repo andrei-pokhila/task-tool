@@ -9,6 +9,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 TELEGRAM_BOT_SECRET_KEY = os.getenv('TELEGRAM_BOT_SECRET_KEY')
+POLLING_INTERVAL = int(os.getenv('POLLING_INTERVAL'))
+
 TELEGRAM_UPDATES_API = \
     f'https://api.telegram.org/bot{TELEGRAM_BOT_SECRET_KEY}/getUpdates'
 
@@ -52,13 +54,19 @@ class TelegramMessage:
     def task_epic(self):
         # first hashtag is the epic name
         if self.hashtags:
-            return self.hashtags[0]
+            epic = self.hashtags[0]
+        else:
+            epic = ''
+        return epic
 
     @property
     def task_components(self):
         # leaving the first hashtags others are task components
         if self.hashtags:
-          return self.hashtags[1:]
+          components = self.hashtags[1:]
+        else:
+            components = []
+        return components
 
 
 
@@ -81,7 +89,7 @@ class TelegramResponse:
 
 def extract_hash_tags(s):
     # return the list of hashtags present in the text
-    return set(part[1:] for part in s.split() if part.startswith('#'))
+    return list(set(part[1:] for part in s.split() if part.startswith('#')))
 
 def only_hashtags(s):
     # method to check if a string contains only hashtags
@@ -147,13 +155,23 @@ if __name__ == "__main__":
         telegram_messages = parse_messages(telegram_response)
         for message in telegram_messages:
             print(message.__dict__)
-            # create jira api payload here
-            # make reuest to fast api
 
-        # wait for next messages
+            payload = {
+                'name' : message.task_name,
+                'desc': message.task_desc,
+                'epic': message.task_epic,
+                'components': message.task_components
+            }
+
+            r = httpx.post('http://localhost:8000/create_jira_task/',
+                           json=payload)
+            LOGGER.error(f'Response: {r.text}')
+
         if get_latest_message_update_id(telegram_response):
-            latest_message_update_id = get_latest_message_update_id(telegram_response) + 1
+            latest_message_update_id = \
+                get_latest_message_update_id(telegram_response) + 1
 
         LOGGER.error(f'Lastest Message Update ID {latest_message_update_id}')
 
-        time.sleep(10)
+        # wait for next messages
+        time.sleep(POLLING_INTERVAL)
