@@ -1,4 +1,12 @@
+# python imports
+import os
+
+# 3rd party modules
 from fastapi import FastAPI
+from dotenv import load_dotenv
+
+# loading the environment variables
+load_dotenv()
 
 app = FastAPI()
 

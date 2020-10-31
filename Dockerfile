@@ -12,3 +12,6 @@ COPY ./app/pyproject.toml ./app/poetry.lock* /app/
 RUN poetry install --no-root --no-dev
 
 COPY ./app /app
+
+WORKDIR /app
+CMD ["python","-i","telegram.py"]
