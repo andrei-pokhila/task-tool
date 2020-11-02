@@ -29,7 +29,6 @@ class TelegramMessage:
     @property
     def task_name(self):
         # first line of message is task name
-        LOGGER.warning(f'Task Name: {self.text_lines[0]}')
         return self.text_lines[0]
 
     @property
@@ -39,7 +38,6 @@ class TelegramMessage:
             desc = self.text_lines[1]
         else:
             desc = ''
-        LOGGER.warning(f'Description: {desc}')
         return desc
 
     @property
@@ -51,18 +49,16 @@ class TelegramMessage:
             hashtags = extract_hash_tags(self.task_desc)
         else:
             hashtags = []
-        LOGGER.warning(f'Hashtags are : {hashtags}')
         return hashtags
 
     @property
     def task_epic(self):
         # first hashtag is the epic name
-        LOGGER.warning('Hashtags are: {}'.format(self.hashtags))
+        LOGGER.error('Hashtags are: {}'.format(self.hashtags))
         if self.hashtags:
             epic = self.hashtags[0]
         else:
             epic = ''
-        LOGGER.warning(f'EPIC: {epic}')
         return epic
 
     @property
@@ -72,7 +68,6 @@ class TelegramMessage:
           components = self.hashtags[1:]
         else:
             components = []
-        LOGGER.warning(f'Components: {components}')
         return components
 
 
@@ -120,7 +115,7 @@ def get_last_message_update_id():
         update_id = latest_update.get('update_id', None)
     else:
         update_id = None
-    LOGGER.warning(f'Last Message Update ID {update_id}')
+    LOGGER.error(f'Last Message Update ID {update_id}')
     return update_id
 
 def get_latest_message_update_id(telegram_respone):
@@ -143,7 +138,7 @@ def get_latest_updates(update_id=None):
     else:
         telegram_response = {}
 
-    LOGGER.warning(f'Latest Updates from telegram {telegram_response}')
+    LOGGER.error(f'Latest Updates from telegram {telegram_response}')
     return telegram_response
 
 def parse_messages(telegram_response):
@@ -156,11 +151,14 @@ def parse_messages(telegram_response):
 
 if __name__ == "__main__":
 
+    # get update id of last recieved message
     latest_message_update_id = get_last_message_update_id()
     while True:
         telegram_response = get_latest_updates(latest_message_update_id)
+        # parse the new updates to create telegram message objects
         telegram_messages = parse_messages(telegram_response)
         for message in telegram_messages:
+            # create a paylod for the FastAPI service
             payload = {
                 'name' : message.task_name,
                 'desc': message.task_desc,
@@ -168,16 +166,18 @@ if __name__ == "__main__":
                 'components': message.task_components
             }
 
-            LOGGER.warning(f'Calling FASTAPI URL: {payload}')
+            LOGGER.error(f'Calling FASTAPI URL: {payload}')
+            # post message data to create the JIRA task
             r = httpx.post('http://localhost:8000/create_jira_task/',
                            json=payload)
-            LOGGER.warning(f'Response: {r.text}')
+            LOGGER.error(f'Response: {r.text}')
 
         if get_latest_message_update_id(telegram_response):
+            # if there are new messages, update the latest_message_update_id
             latest_message_update_id = \
                 get_latest_message_update_id(telegram_response) + 1
 
-        LOGGER.warning(f'Lastest Message Update ID {latest_message_update_id}')
+        LOGGER.error(f'Lastest Message Update ID {latest_message_update_id}')
 
         # wait for next messages
         time.sleep(POLLING_INTERVAL)

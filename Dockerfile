@@ -14,4 +14,8 @@ RUN poetry install --no-root --no-dev
 COPY ./app /app
 
 WORKDIR /app
-CMD ["python","-i","telegram.py"]
+
+RUN apt-get update && apt-get install -y supervisor && apt-get install -y apt-utils
+RUN mkdir -p /var/log/supervisor
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf", "-n"]
