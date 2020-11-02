@@ -37,12 +37,15 @@ def get_create_issue_payload(request_data):
                 "description": request_data.desc,
                    "issuetype": {
                         "name": "Task"
-                    },
-                'components': [{'name': component} for component in request_data.components],
-                JIRA_EPIC_CUSTOM_FIELD: request_data.epic
+                    }
                 }
             }
-    LOGGER.warning(f'Jira payload: {payload}')
+    if request_data.epic:
+        payload['fields'][JIRA_EPIC_CUSTOM_FIELD] = request_data.epic
+
+    if request_data.components:
+        payload['fields']['components'] = [{'name': component} for component in request_data.components]
+    LOGGER.error(f'Jira payload: {payload}')
     return payload
 
 
