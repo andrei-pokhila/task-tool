@@ -1,7 +1,7 @@
 # About the project:
 Task Tool is an application using which you can create JIRA issues using Telegram messages.
 
-
+## Setting up environment variables
 To run the serice you will need to configure the .env file in the app/ directory.
 
 Create a file called .env(touch .env) and add the following parameters:
@@ -20,14 +20,15 @@ Create a file called .env(touch .env) and add the following parameters:
 `JIRA_EPIC_CUSTOM_FIELD=<JIRA EPIC URL Customfild ID eg: customfield_10014>`
 
 
-# Running using Docker:
+## Running using Docker:
 
 `docker-compose build`
 
 `docker-compose up`
 
-# Setting up dev:
-## Installing Python and dependencies:
+## Setting up dev:
+
+### Installing Python and dependencies:
 Installing Pyenv to manage python versions
 
 [Pyenv](https://github.com/pyenv/pyenv#installation)
