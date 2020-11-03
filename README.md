@@ -57,13 +57,15 @@ Clone the repository then:
 
 Running the services:
 
+Activate the virtualenv in both terminals before running the commands
+
 On one terminal run the telegram message reading service(in app/ directory):
 
 `python telegram.py`
 
 This service will keep keep polling for the incoming messages
 
-Running the FastAPI service(in app/ directory):
+On the second terminal run the FastAPI service(in app/ directory):
 
 `uvicorn main:app --reload`
 
