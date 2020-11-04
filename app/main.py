@@ -58,7 +58,6 @@ async def create_jira_task(jira_task_payload: JiraTask):
     payload = get_create_issue_payload(jira_task_payload)
 
     async with httpx.AsyncClient() as client:
-        LOGGER.error("###### In async")
         r = await client.post(JIRA_ISSUE_API, json=payload,
                               auth=(JIRA_EMAIL, JIRA_PASSWORD))
     return r.json()
