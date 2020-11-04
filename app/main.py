@@ -53,20 +53,12 @@ app = FastAPI()
 
 
 @app.post("/create_jira_task/")
-def create_jira_task(jira_task_payload: JiraTask):
+async def create_jira_task(jira_task_payload: JiraTask):
     # use the request data to create the issue
     payload = get_create_issue_payload(jira_task_payload)
-    r = httpx.post(JIRA_ISSUE_API, json=payload, auth=(JIRA_EMAIL,
-                                                       JIRA_PASSWORD))
+
+    async with httpx.AsyncClient() as client:
+        LOGGER.error("###### In async")
+        r = await client.post(JIRA_ISSUE_API, json=payload,
+                              auth=(JIRA_EMAIL, JIRA_PASSWORD))
     return r.json()
-
-
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: str = None):
-    return {"item_id": item_id, "q": q}
